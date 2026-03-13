@@ -133,9 +133,11 @@ class DataLoaderTests(unittest.TestCase):
             _write_dataset_csv(data_dir)
 
             loaded_dataset = load_market_data(data_dir)
+            loaded_symbols = [item.profile.symbol for item in loaded_dataset]
+            demo_symbols = [item.profile.symbol for item in demo_dataset]
 
             self.assertEqual(len(loaded_dataset), len(demo_dataset))
-            self.assertEqual([item.profile.symbol for item in loaded_dataset], [item.profile.symbol for item in demo_dataset])
+            self.assertEqual(loaded_symbols, demo_symbols)
             self.assertEqual(loaded_dataset[0].snapshots["09:20"], demo_dataset[0].snapshots["09:20"])
             self.assertEqual(loaded_dataset[0].bars[0], demo_dataset[0].bars[0])
 

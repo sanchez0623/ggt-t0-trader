@@ -15,7 +15,7 @@ def load_market_data(data_dir: str | Path) -> list[SecurityDay]:
     bars = _load_bars(base_path / "bars.csv")
     profile_order = {symbol: index for index, symbol in enumerate(profiles)}
 
-    trading_keys = sorted(set(snapshots) | set(bars), key=lambda item: (item[1], profile_order.get(item[0], len(profile_order)), item[0]))
+    trading_keys = sorted(set(snapshots) | set(bars), key=lambda item: _security_day_sort_key(item, profile_order))
     securities: list[SecurityDay] = []
     for symbol, trading_day in trading_keys:
         profile = profiles.get(symbol)
@@ -102,3 +102,10 @@ def _load_bars(path: Path) -> dict[tuple[str, date], list[PriceBar]]:
 
 def _parse_bool(value: str) -> bool:
     return value.strip().lower() in {"1", "true", "t", "yes", "y"}
+
+
+def _security_day_sort_key(
+    item: tuple[str, date], profile_order: dict[str, int]
+) -> tuple[date, int, str]:
+    symbol, trading_day = item
+    return trading_day, profile_order.get(symbol, len(profile_order)), symbol
