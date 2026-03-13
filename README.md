@@ -4,7 +4,7 @@
 这是一个最小可运行的 Python 可视化交易系统原型，用于落地题述的 **港股通日内 T0 动量策略**。仓库当前提供：
 
 - **双阶段采样**：9:20/9:25/9:28 + 9:32/9:34/9:36/9:38/9:40，并补充 13:00/13:05 午盘窗口。
-- **基础标的池过滤**：港股通可交易、流通市值 50-500 亿港币、20 日日均成交额 ≥ 3000 万港币、60 分钟 RSI ≥ 50、无负面公告。
+- **基础标的池过滤**：港股通可交易、流通市值 50亿-500亿港币、20 日日均成交额 ≥ 3000 万港币、60 分钟 RSI ≥ 50、无负面公告。
 - **相对指标筛选**：量比、集合竞价/开盘涨跌幅、3 分钟涨速排名、大单买入占比、委卖/委买金额比、港股通净买入占比。
 - **量化打分模型**：按出现次数、平均量比排名、平均涨速排名、大单买入占比、港股通净买入占比计算 100 分制总分，并在 9:40 选出 3-5 只构建组合。
 - **交易执行和风控**：9:40-10:00 回踩均线入场、价差控制、3%/5% 分批止盈、2% 止损、1 小时时间止损、15:50 强平，以及大盘/VCM/黑天鹅风控钩子。
@@ -15,21 +15,21 @@
 ### 1. 运行单元测试
 
 ```bash
-cd /home/runner/work/ggt-t0-trader/ggt-t0-trader
+cd /path/to/ggt-t0-trader
 python -m unittest discover -s tests -v
 ```
 
 ### 2. 生成 HTML 仪表盘
 
 ```bash
-cd /home/runner/work/ggt-t0-trader/ggt-t0-trader
+cd /path/to/ggt-t0-trader
 python -m ggt_t0_trader --output /tmp/ggt_t0_dashboard.html
 ```
 
 ### 3. 启动本地可视化页面
 
 ```bash
-cd /home/runner/work/ggt-t0-trader/ggt-t0-trader
+cd /path/to/ggt-t0-trader
 python -m ggt_t0_trader --serve --host 127.0.0.1 --port 8000
 ```
 
@@ -37,10 +37,10 @@ python -m ggt_t0_trader --serve --host 127.0.0.1 --port 8000
 
 ## 代码结构
 
-- `/home/runner/work/ggt-t0-trader/ggt-t0-trader/ggt_t0_trader/strategy.py`：采样、过滤、打分、建仓权重控制。
-- `/home/runner/work/ggt-t0-trader/ggt-t0-trader/ggt_t0_trader/backtest.py`：入场逻辑、止盈止损、风控、绩效指标。
-- `/home/runner/work/ggt-t0-trader/ggt-t0-trader/ggt_t0_trader/reporting.py`：HTML 仪表盘渲染。
-- `/home/runner/work/ggt-t0-trader/ggt-t0-trader/ggt_t0_trader/demo.py`：演示数据集，便于本地验证与截图。
+- `ggt_t0_trader/strategy.py`：采样、过滤、打分、建仓权重控制。
+- `ggt_t0_trader/backtest.py`：入场逻辑、止盈止损、风控、绩效指标。
+- `ggt_t0_trader/reporting.py`：HTML 仪表盘渲染。
+- `ggt_t0_trader/demo.py`：演示数据集，便于本地验证与截图。
 
 ## 数据接入建议
 

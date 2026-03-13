@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
-from math import inf, sqrt
 from statistics import mean, pstdev
 from typing import Iterable, List, Sequence
 
@@ -16,6 +16,8 @@ from .models import (
     Trade,
 )
 from .strategy import HongKongT0MomentumStrategy
+
+INFINITE_PROFIT_FACTOR_CAP = 999.0
 
 
 @dataclass(frozen=True)
@@ -203,17 +205,18 @@ class BacktestEngine:
         gross_profit = sum(max(0.0, trade.pnl_amount) for trade in trades)
         gross_loss = sum(min(0.0, trade.pnl_amount) for trade in trades)
         win_rate = sum(1 for trade in trades if trade.pnl_amount > 0) / len(trades) * 100
-        profit_factor = gross_profit / abs(gross_loss) if gross_loss else inf
+        loss_magnitude = -gross_loss
+        profit_factor = gross_profit / loss_magnitude if loss_magnitude > 0 else INFINITE_PROFIT_FACTOR_CAP
         drawdown = self._max_drawdown(equity_curve)
         sharpe = 0.0
         if len(trade_returns) > 1 and pstdev(trade_returns) > 0:
-            sharpe = mean(trade_returns) / pstdev(trade_returns) * sqrt(len(trade_returns))
+            sharpe = mean(trade_returns) / pstdev(trade_returns) * math.sqrt(len(trade_returns))
         ending_capital = self.config.initial_capital + sum(trade.pnl_amount for trade in trades)
         total_return_pct = (ending_capital - self.config.initial_capital) / self.config.initial_capital * 100
         return PerformanceMetrics(
             total_return_pct=round(total_return_pct, 2),
             win_rate_pct=round(win_rate, 2),
-            profit_factor=round(profit_factor if profit_factor != inf else 999.0, 2),
+            profit_factor=round(profit_factor, 2),
             max_drawdown_pct=round(drawdown, 2),
             sharpe_ratio=round(sharpe, 2),
             trades=len(trades),

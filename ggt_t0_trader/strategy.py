@@ -75,6 +75,7 @@ class HongKongT0MomentumStrategy:
         return candidates
 
     def _rank_score(self, average_rank: float, max_score: float) -> float:
+        """Map a lower average rank to a higher score while preserving the configured top-N cut-off."""
         capped_rank = min(max(average_rank, 1.0), float(self.config.max_speed_rank))
         relative = (self.config.max_speed_rank + 1 - capped_rank) / self.config.max_speed_rank
         return round(relative * max_score, 2)
@@ -161,7 +162,9 @@ class HongKongT0MomentumStrategy:
     def build_portfolio(self, scored_candidates: List[CandidateScore]) -> PortfolioSelection:
         if not scored_candidates:
             return PortfolioSelection(positions=[], per_position_weight=0.0, total_weight=0.0)
-        desired_positions = min(self.config.max_positions, max(self.config.min_positions, len(scored_candidates)))
+        available_candidates = len(scored_candidates)
+        minimum_target = max(self.config.min_positions, available_candidates)
+        desired_positions = min(self.config.max_positions, minimum_target)
         selected = scored_candidates[:desired_positions]
         per_position_weight = min(self.config.max_position_weight, self.config.max_total_weight / len(selected))
         total_weight = round(per_position_weight * len(selected), 4)
