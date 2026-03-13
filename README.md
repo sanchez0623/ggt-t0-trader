@@ -35,6 +35,21 @@ python -m ggt_t0_trader --serve --host 127.0.0.1 --port 8000
 
 然后打开 `http://127.0.0.1:8000` 即可查看演示仪表盘。
 
+### 4. 接入本地两年真实分钟级数据验证
+
+```bash
+cd /path/to/ggt-t0-trader
+python -m ggt_t0_trader --data-dir /path/to/real-data --output /tmp/ggt_t0_real_dashboard.html
+```
+
+`--data-dir` 目录下需包含以下三个 CSV 文件：
+
+- `profiles.csv`：`symbol,name,stock_connect_eligible,float_market_cap_hkd,avg_turnover_20d_hkd,rsi_60m,has_negative_announcement`
+- `snapshots.csv`：`symbol,trading_day,sample_time,last_price,auction_change_pct,intraday_change_pct,speed_3m_change_pct,speed_3m_rank,volume_ratio,volume_ratio_rank,block_buy_ratio,ask_bid_notional_ratio,southbound_net_buy_ratio,spread_pct,vwap,post_open_peak_gain_pct`
+- `bars.csv`：`symbol,timestamp,price,vwap,spread_pct,intraday_gain_pct,post_open_peak_gain_pct,ask_bid_notional_ratio,hang_seng_change_pct,hs300_change_pct,triggered_vcm,black_swan_event`
+
+这样就可以直接把本地沉淀的两年分钟级真实数据映射到现有模型，复用当前筛选、回测和 HTML 仪表盘输出。
+
 ## 代码结构
 
 - `ggt_t0_trader/strategy.py`：采样、过滤、打分、建仓权重控制。
@@ -44,7 +59,7 @@ python -m ggt_t0_trader --serve --host 127.0.0.1 --port 8000
 
 ## 数据接入建议
 
-当前为了保持仓库精简，内置了一个标准化演示数据集；若要接入真实两年分钟级数据，可直接复用以下模型：
+当前为了保持仓库精简，内置了一个标准化演示数据集；仓库现已支持通过 `--data-dir` 加载本地真实 CSV 数据。若要接入真实两年分钟级数据，可直接复用以下模型：
 
 - `InstrumentProfile`：基础标的池前置过滤字段。
 - `SampleSnapshot`：每个采样时点的相对指标。
